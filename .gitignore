@@ -1,0 +1,22 @@
+# Native Windows build output
+TypoRacer.exe
+*.exe
+*.obj
+*.o
+*.dll
+*.pdb
+
+# Runtime scores and typing history
+scores.dat
+history.csv
+
+# IDE/editor files
+.vscode/
+.idea/
+*.user
+*.suo
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+desktop.ini

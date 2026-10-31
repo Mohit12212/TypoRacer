@@ -1,18 +1,28 @@
 @echo off
-title Building TypoRacer Pro...
-echo ======================================================
-echo           Building TypoRacer Pro (C++ GUI)
-echo ======================================================
+setlocal
+cd /d "%~dp0"
+title Building TypoRacer
 
-g++ -o "TypoRacer.exe" src/main.cpp src/TypingTest.cpp -mwindows -lgdi32 -lcomctl32 -luser32 -lwinmm -std=c++14 -O2
+echo ==========================================
+echo          Building TypoRacer (C++ GUI)
+echo ==========================================
 
-if %errorlevel% == 0 (
-    echo.
-    echo [SUCCESS] TypoRacer.exe built successfully!
-    echo Launching TypoRacer Pro...
-    start TypoRacer.exe
-) else (
-    echo.
-    echo [ERROR] Build failed! Ensure MinGW g++ is installed and on your PATH.
+where g++ >nul 2>nul
+if errorlevel 1 (
+    echo [ERROR] g++ was not found. Install MinGW-w64 and add its bin folder to PATH.
     pause
+    exit /b 1
 )
+
+g++ -std=c++14 -O2 -mwindows -o "TypoRacer.exe" "src/main.cpp" "src/TypingTest.cpp" -lgdi32 -lcomctl32 -luser32 -lwinmm
+if errorlevel 1 (
+    echo.
+    echo [ERROR] Build failed. Review the compiler messages above.
+    pause
+    exit /b 1
+)
+
+echo.
+echo [SUCCESS] TypoRacer.exe built successfully.
+start "" "%~dp0TypoRacer.exe"
+endlocal
