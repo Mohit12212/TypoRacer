@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TypoRacer Studio — Advanced Computer Aptitude & Typing Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --card-active: #21262d;
+      --border: #30363d;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --amber: #f59e0b;
+      --correct: #10b981;
+      --wrong: #f43f5e;
+      --text: #f0f6fc;
+      --text-muted: #8b949e;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Fira Code', Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* Top Navigation */
+    header {
+      width: 100%;
+      max-width: 1100px;
+      padding: 24px 32px 10px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent), #6366f1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-title span { color: var(--accent); }
+    .brand-sub { font-size: 12px; color: var(--text-muted); }
+
+    .nav-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .pill-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-btn:hover, .pill-btn.active {
+      color: var(--text);
+      border-color: var(--accent);
+      background: var(--card-active);
+    }
+
+    /* Controls & Pill Bar */
+    .config-bar {
+      margin-top: 15px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 6px 12px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      font-size: 13px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .config-group {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .config-divider {
+      width: 1px;
+      height: 18px;
+      background: var(--border);
+    }
+
+    .config-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .config-btn:hover { color: var(--text); }
+    .config-btn.active {
+      background: var(--card-active);
+      color: var(--accent);
+    }
+
+    /* Main Container */
+    main {
+      width: 100%;
+      max-width: 1100px;
+      padding: 24px 32px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Live Ghost Race Track */
+    .racetrack {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .race-lane {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .lane-label {
+      width: 85px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lane-track {
+      flex: 1;
+      height: 8px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      position: relative;
+      overflow: visible;
+    }
+
+    .lane-bar {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.15s linear;
+      position: relative;
+    }
+
+    .lane-car {
+      position: absolute;
+      right: -10px;
+      top: -8px;
+      font-size: 16px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+
+    .player-bar { background: linear-gradient(90deg, #0284c7, var(--accent)); }
+    .bot-bar { background: linear-gradient(90deg, #d97706, var(--amber)); }
+
+    /* Typing Stage */
+    .typing-container {
+      width: 100%;
+      position: relative;
+      background: transparent;
+      margin: 10px 0 20px 0;
+      cursor: text;
+    }
+
+    .live-hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 16px;
+      padding: 0 8px;
+    }
+
+    .hud-metrics {
+      display: flex;
+      gap: 28px;
+    }
+
+    .hud-stat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hud-stat .val {
+      font-size: 32px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .hud-stat .lbl {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .hud-timer {
+      font-size: 36px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--amber);
+    }
+
+    /* Words Flow Area */
+    .words-box {
+      font-family: var(--font-mono);
+      font-size: 24px;
+      line-height: 1.65;
+      padding: 24px 28px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      position: relative;
+      min-height: 180px;
+      max-height: 240px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
+
+    .words-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      transition: transform 0.2s ease;
+    }
+
+    .word {
+      display: inline-flex;
+      position: relative;
+    }
+
+    .letter {
+      position: relative;
+      color: #64748b;
+      transition: color 0.1s;
+    }
+
+    .letter.correct { color: #f8fafc; }
+    .letter.wrong {
+      color: var(--wrong);
+      text-decoration: underline;
+    }
+
+    /* Smooth Gliding Cursor */
+    .caret {
+      position: absolute;
+      width: 2.5px;
+      height: 30px;
+      background: var(--accent);
+      border-radius: 2px;
+      box-shadow: 0 0 10px var(--accent);
+      transition: left 0.08s linear, top 0.1s ease;
+      animation: blink 1s infinite;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .hidden-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Interactive Virtual Keyboard */
+    .keyboard {
+      width: 100%;
+      max-width: 900px;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+
+    .kb-row {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .kb-key {
+      height: 38px;
+      min-width: 38px;
+      padding: 0 10px;
+      background: #1c2129;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #c9d1d9;
+      position: relative;
+      transition: all 0.15s;
+    }
+
+    .kb-key.next {
+      background: var(--accent);
+      color: #0b0f19;
+      border-color: #fff;
+      font-weight: 700;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    .kb-key.finger-pinky { border-bottom: 2px solid #f43f5e; }
+    .kb-key.finger-ring  { border-bottom: 2px solid #f97316; }
+    .kb-key.finger-mid   { border-bottom: 2px solid #eab308; }
+    .kb-key.finger-index { border-bottom: 2px solid #10b981; }
+    .kb-key.finger-thumb { border-bottom: 2px solid var(--accent); }
+
+    /* Results Dashboard View */
+    .results-view {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      display: none;
+      flex-direction: column;
+      animation: fadeIn 0.3s ease;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+
+    .hero-stat {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .hero-wpm {
+      font-size: 72px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .hero-label {
+      font-size: 16px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .grade-badge-circle {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 3px solid var(--accent);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    .grade-badge-circle .grade {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .grade-badge-circle .rank-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    .results-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .metric-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+
+    .metric-card .val {
+      font-size: 26px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--text);
+    }
+
+    .metric-card .lbl {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    /* Speed Curve Canvas */
+    .chart-box {
+      width: 100%;
+      height: 200px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .results-actions {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+    }
+
+    .action-btn {
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0b0f19;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+    .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+    .btn-secondary {
+      background: var(--card-active);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: #30363d; }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 650px;
+      padding: 30px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    /* History Table */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 14px;
+    }
+
+    .history-table th {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .history-table td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <div>
+        <div class="brand-title">TypoRacer <span>Studio</span></div>
+        <div class="brand-sub">Computer Aptitude & Keystroke Intelligence</div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button class="pill-btn" id="btnSound" onclick="toggleSound()">🔊 Sound: On</button>
+      <button class="pill-btn" onclick="openHistoryModal()">📊 History</button>
+      <button class="pill-btn" id="btnKbToggle" onclick="toggleKeyboard()">⌨ Keyboard</button>
+    </div>
+  </header>
+
+  <!-- Config Bar (Modes & Timing) -->
+  <div class="config-bar" id="configBar">
+    <div class="config-group">
+      <button class="config-btn active" onclick="setCategory('prose', this)">📄 Prose</button>
+      <button class="config-btn" onclick="setCategory('code', this)">💻 Code</button>
+      <button class="config-btn" onclick="setCategory('numbers', this)">🔢 Numbers</button>
+      <button class="config-btn" onclick="setCategory('survival', this)">⚡ Survival</button>
+    </div>
+    <div class="config-divider"></div>
+    <div class="config-group">
+      <button class="config-btn" onclick="setTime(15, this)">15s</button>
+      <button class="config-btn active" onclick="setTime(30, this)">30s</button>
+      <button class="config-btn" onclick="setTime(60, this)">60s</button>
+    </div>
+    <div class="config-divider"></div>
+    <div class="config-group">
+      <span style="font-size: 12px; color: var(--text-muted); margin-right: 4px;">AI Bot:</span>
+      <button class="config-btn" onclick="setBotSpeed(0, this)">Off</button>
+      <button class="config-btn active" onclick="setBotSpeed(60, this)">60 WPM</button>
+      <button class="config-btn" onclick="setBotSpeed(85, this)">85 WPM</button>
+    </div>
+  </div>
+
+  <!-- Main View -->
+  <main>
+    <!-- Live Dual-Lane Racetrack -->
+    <div class="racetrack" id="racetrack">
+      <div class="race-lane">
+        <div class="lane-label" style="color: var(--accent);">🏎 YOU</div>
+        <div class="lane-track">
+          <div class="lane-bar player-bar" id="playerBar" style="width: 0%;">
+            <div class="lane-car">🏎</div>
+          </div>
+        </div>
+      </div>
+      <div class="race-lane" id="botLane">
+        <div class="lane-label" style="color: var(--amber);">🤖 BOT (<span id="botSpeedLabel">60</span>)</div>
+        <div class="lane-track">
+          <div class="lane-bar bot-bar" id="botBar" style="width: 0%;">
+            <div class="lane-car">🚗</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Typing Stage -->
+    <div class="typing-container" id="stageTyping" onclick="focusInput()">
+      <div class="live-hud">
+        <div class="hud-metrics">
+          <div class="hud-stat">
+            <span class="val" id="hudWpm">0</span>
+            <span class="lbl">wpm</span>
+          </div>
+          <div class="hud-stat">
+            <span class="val" id="hudAcc">100%</span>
+            <span class="lbl">acc</span>
+          </div>
+          <div class="hud-stat">
+            <span class="val" id="hudCons">100%</span>
+            <span class="lbl">consistency</span>
+          </div>
+        </div>
+        <div class="hud-timer" id="hudTimer">30</div>
+      </div>
+
+      <div class="words-box">
+        <div class="caret" id="caret"></div>
+        <div class="words-wrapper" id="wordsWrapper"></div>
+      </div>
+
+      <input type="text" class="hidden-input" id="hiddenInput" autocomplete="off" autocapitalize="off" spellcheck="false">
+    </div>
+
+    <!-- On-Screen Visual Keyboard -->
+    <div class="keyboard" id="keyboard"></div>
+
+    <!-- Results Dashboard View -->
+    <div class="results-view" id="stageResults">
+      <div class="results-header">
+        <div class="hero-stat">
+          <span class="hero-wpm" id="resWpm">0.0</span>
+          <span class="hero-label">Net Words Per Minute</span>
+        </div>
+        <div class="grade-badge-circle" id="resBadgeCircle">
+          <span class="grade" id="resGrade">A</span>
+          <span class="rank-lbl">RANK</span>
+        </div>
+      </div>
+
+      <div class="results-metrics-grid">
+        <div class="metric-card">
+          <div class="val" id="resAcc">98.5%</div>
+          <div class="lbl">Accuracy</div>
+        </div>
+        <div class="metric-card">
+          <div class="val" id="resCons">92.0%</div>
+          <div class="lbl">Consistency</div>
+        </div>
+        <div class="metric-card">
+          <div class="val" id="resCpm">390</div>
+          <div class="lbl">Characters / Min</div>
+        </div>
+        <div class="metric-card">
+          <div class="val" id="resTime">30s</div>
+          <div class="lbl">Time Elapsed</div>
+        </div>
+      </div>
+
+      <div class="chart-box">
+        <canvas id="speedChart" style="width: 100%; height: 100%;"></canvas>
+      </div>
+
+      <div style="margin-bottom: 25px; padding: 14px 18px; background: rgba(56, 189, 248, 0.08); border-left: 4px solid var(--accent); border-radius: 8px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--accent); text-transform: uppercase;">Aptitude Evaluation Diagnostics:</div>
+        <div style="font-size: 13px; color: #cbd5e1; margin-top: 4px;" id="resDiagnostics">Flawless rhythm! Keystroke interval standard deviation within professional benchmarks.</div>
+      </div>
+
+      <div class="results-actions">
+        <button class="action-btn btn-primary" onclick="restartTest()">↺ Next Test (Tab)</button>
+        <button class="action-btn btn-secondary" onclick="exportCertificate()">📜 Print Official Certificate</button>
+        <button class="action-btn btn-secondary" onclick="openHistoryModal()">📊 Session Logs</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- History Modal -->
+  <div class="modal-overlay" id="historyModal">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span>Historical Session Records</span>
+        <button class="close-btn" onclick="closeHistoryModal()">&times;</button>
+      </div>
+      <div style="max-height: 320px; overflow-y: auto;">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Category</th>
+              <th>WPM</th>
+              <th>Accuracy</th>
+              <th>Rank</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="pill-btn" onclick="clearHistory()">Clear All Logs</button>
+        <button class="pill-btn active" onclick="closeHistoryModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Audio Synthesizer (Web Audio API) ───────────────────────────────────────
+    class ProceduralAudio {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+      init() {
+        if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      playClick(freq = 1600, duration = 0.015) {
+        if (!this.enabled) return;
+        this.init();
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+      }
+      playBell() {
+        if (!this.enabled) return;
+        this.init();
+        const freqs = [2093, 2637, 3136];
+        freqs.forEach((f, i) => {
+          setTimeout(() => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.frequency.setValueAtTime(f, this.ctx.currentTime);
+            gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.4);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(this.ctx.currentTime + 0.4);
+          }, i * 70);
+        });
+      }
+    }
+    const audio = new ProceduralAudio();
+
+    // ── Dataset Pools ──────────────────────────────────────────────────────────
+    const POOLS = {
+      prose: [
+        "Computer programming is the craft of transforming logical concepts into precise executable instructions. Skilled software engineers write modular code to solve complicated problems and design modern platforms that empower millions of global users across diverse industries every single day.",
+        "The widespread adoption of cloud computing and ubiquitous mobile devices has revolutionized global collaboration. Teams located across continents can synchronize repositories, manage serverless workflows, and deliver scalable applications with exceptional velocity.",
+        "Artificial intelligence and deep machine learning algorithms continue to transform technology by discovering non-linear patterns across large data sets. Automation optimizes repetitive processes while opening up exciting avenues for scientific research."
+      ],
+      code: [
+        "template <typename T> int binarySearch(const std::vector<T>& arr, T target) { int low = 0, high = (int)arr.size() - 1; while (low <= high) { int mid = low + (high - low) / 2; if (arr[mid] == target) return mid; if (arr[mid] < target) low = mid + 1; else high = mid - 1; } return -1; }",
+        "def quick_sort(arr): if len(arr) <= 1: return arr; pivot = arr[len(arr) // 2]; left = [x for x in arr if x < pivot]; middle = [x for x in arr if x == pivot]; right = [x for x in arr if x > pivot]; return quick_sort(left) + middle + quick_sort(right)",
+        "SELECT u.user_id, u.username, COUNT(o.order_id) AS total_orders, SUM(o.total_amount) AS ltv FROM users u JOIN orders o ON u.user_id = o.customer_id WHERE u.is_active = 1 GROUP BY u.user_id HAVING SUM(o.total_amount) > 1000 ORDER BY ltv DESC;"
+      ],
+      numbers: [
+        "IPv4: 192.168.1.254 | Port: 8080 | Subnet: 255.255.255.0 | Gateway: 10.0.0.1 Math: (alpha * 3.14159) / (beta + 1.414e-3) >= [x & 0xFF00] ^ 0x0F; Regex: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$",
+        "Account #8492-4910-3819 | Balance: $14,920.50 | Rate: +5.75% Tokens: { @user_id: 98124, key: 'aB3#x9$K!', expires_in: 3600s } Matrix: [[1, 0], [0, 1]] * [x, y]^T = [0, 0];"
+      ],
+      survival: [
+        "Survival Mode demands relentless concentration and flawless keystroke precision. Do not allow panic to degrade your rhythm. Every misplaced character damages your accuracy rating. Strike each key cleanly and stay ahead of the clock.",
+        "In mission-critical software engineering, a misplaced semicolon can compromise distributed systems. Maintain flawless speed now under pressure."
+      ]
+    };
+
+    // ── State Variables ────────────────────────────────────────────────────────
+    let currentCategory = 'prose';
+    let totalTime = 30;
+    let timeRemaining = 30;
+    let botWpm = 60;
+    let isRunning = false;
+    let timerInterval = null;
+
+    let sampleText = '';
+    let typedText = '';
+    let keystrokeTimestamps = [];
+    let wpmTimeline = [];
+    let errorMap = {};
+    let backspaces = 0;
+
+    // ── DOM References ─────────────────────────────────────────────────────────
+    const hiddenInput = document.getElementById('hiddenInput');
+    const wordsWrapper = document.getElementById('wordsWrapper');
+    const caret = document.getElementById('caret');
+    const hudWpm = document.getElementById('hudWpm');
+    const hudAcc = document.getElementById('hudAcc');
+    const hudCons = document.getElementById('hudCons');
+    const hudTimer = document.getElementById('hudTimer');
+    const playerBar = document.getElementById('playerBar');
+    const botBar = document.getElementById('botBar');
+    const stageTyping = document.getElementById('stageTyping');
+    const stageResults = document.getElementById('stageResults');
+    const configBar = document.getElementById('configBar');
+
+    // ── Keyboard Layout ────────────────────────────────────────────────────────
+    const KB_ROWS = [
+      [{k:'`',f:'pinky'},{k:'1',f:'pinky'},{k:'2',f:'ring'},{k:'3',f:'mid'},{k:'4',f:'index'},{k:'5',f:'index'},{k:'6',f:'index'},{k:'7',f:'index'},{k:'8',f:'mid'},{k:'9',f:'ring'},{k:'0',f:'pinky'},{k:'-',f:'pinky'},{k:'=',f:'pinky'},{k:'Bksp',f:'pinky',w:1.5}],
+      [{k:'Tab',f:'pinky',w:1.4},{k:'Q',f:'pinky'},{k:'W',f:'ring'},{k:'E',f:'mid'},{k:'R',f:'index'},{k:'T',f:'index'},{k:'Y',f:'index'},{k:'U',f:'index'},{k:'I',f:'mid'},{k:'O',f:'ring'},{k:'P',f:'pinky'},{k:'[',f:'pinky'},{k:']',f:'pinky'},{k:'\\',f:'pinky'}],
+      [{k:'Caps',f:'pinky',w:1.6},{k:'A',f:'pinky'},{k:'S',f:'ring'},{k:'D',f:'mid'},{k:'F',f:'index'},{k:'G',f:'index'},{k:'H',f:'index'},{k:'J',f:'index'},{k:'K',f:'mid'},{k:'L',f:'ring'},{k:';',f:'pinky'},{k:'\'',f:'pinky'},{k:'Enter',f:'pinky',w:1.8}],
+      [{k:'Shift',f:'pinky',w:2.0},{k:'Z',f:'pinky'},{k:'X',f:'ring'},{k:'C',f:'mid'},{k:'V',f:'index'},{k:'B',f:'index'},{k:'N',f:'index'},{k:'M',f:'index'},{k:',',f:'mid'},{k:'.',f:'ring'},{k:'/',f:'pinky'},{k:'Shift',f:'pinky',w:2.2}],
+      [{k:'Ctrl',f:'pinky',w:1.5},{k:'Alt',f:'thumb',w:1.5},{k:'Space',f:'thumb',w:7.0,match:' '},{k:'Alt',f:'thumb',w:1.5},{k:'Ctrl',f:'pinky',w:1.5}]
+    ];
+
+    function renderKeyboard() {
+      const kb = document.getElementById('keyboard');
+      kb.innerHTML = '';
+      KB_ROWS.forEach(row => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'kb-row';
+        row.forEach(item => {
+          const kEl = document.createElement('div');
+          kEl.className = `kb-key finger-${item.f}`;
+          kEl.textContent = item.k;
+          kEl.dataset.key = item.match || item.k.toUpperCase();
+          if (item.w) kEl.style.flex = item.w;
+          rowEl.appendChild(kEl);
+        });
+        kb.appendChild(rowEl);
+      });
+    }
+
+    function updateKeyboardNextKey(nextChar) {
+      document.querySelectorAll('.kb-key').forEach(el => el.classList.remove('next'));
+      if (!nextChar) return;
+      const target = nextChar === ' ' ? ' ' : nextChar.toUpperCase();
+      const el = document.querySelector(`.kb-key[data-key="${target}"]`);
+      if (el) el.classList.add('next');
+    }
+
+    // ── Test Setup & Render ────────────────────────────────────────────────────
+    function initTest() {
+      const pool = POOLS[currentCategory] || POOLS.prose;
+      sampleText = pool[Math.floor(Math.random() * pool.length)];
+      typedText = '';
+      timeRemaining = totalTime;
+      isRunning = false;
+      clearInterval(timerInterval);
+      keystrokeTimestamps = [];
+      wpmTimeline = [];
+      errorMap = {};
+      backspaces = 0;
+
+      hudWpm.textContent = '0';
+      hudAcc.textContent = '100%';
+      hudCons.textContent = '100%';
+      hudTimer.textContent = timeRemaining;
+      playerBar.style.width = '0%';
+      botBar.style.width = '0%';
+
+      wordsWrapper.innerHTML = '';
+      const words = sampleText.split(' ');
+      words.forEach((w, wIdx) => {
+        const wSpan = document.createElement('span');
+        wSpan.className = 'word';
+        for (let i = 0; i < w.length; i++) {
+          const lSpan = document.createElement('span');
+          lSpan.className = 'letter';
+          lSpan.textContent = w[i];
+          wSpan.appendChild(lSpan);
+        }
+        wordsWrapper.appendChild(wSpan);
+        if (wIdx < words.length - 1) {
+          const spSpan = document.createElement('span');
+          spSpan.className = 'letter';
+          spSpan.textContent = ' ';
+          wordsWrapper.appendChild(spSpan);
+        }
+      });
+
+      stageTyping.style.display = 'block';
+      stageResults.style.display = 'none';
+      configBar.style.display = 'flex';
+      hiddenInput.value = '';
+      focusInput();
+      updateCaret();
+      updateKeyboardNextKey(sampleText[0]);
+    }
+
+    function focusInput() {
+      hiddenInput.focus();
+    }
+
+    function updateCaret() {
+      const letters = wordsWrapper.querySelectorAll('.letter');
+      const idx = typedText.length;
+      if (idx < letters.length) {
+        const target = letters[idx];
+        const rect = target.getBoundingClientRect();
+        const parentRect = wordsWrapper.getBoundingClientRect();
+        caret.style.left = `${rect.left - parentRect.left}px`;
+        caret.style.top = `${rect.top - parentRect.top + 2}px`;
+      }
+    }
+
+    // ── Input Handling ─────────────────────────────────────────────────────────
+    hiddenInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace') {
+        backspaces++;
+        audio.playClick(1100, 0.018);
+      } else if (e.key === ' ') {
+        audio.playClick(800, 0.022);
+      } else if (e.key.length === 1) {
+        audio.playClick(1600, 0.015);
+      }
+    });
+
+    hiddenInput.addEventListener('input', () => {
+      if (!isRunning) {
+        isRunning = true;
+        startTimer();
+      }
+
+      typedText = hiddenInput.value;
+      keystrokeTimestamps.push(Date.now());
+
+      const letters = wordsWrapper.querySelectorAll('.letter');
+      let correct = 0;
+      let errors = 0;
+
+      for (let i = 0; i < letters.length; i++) {
+        letters[i].className = 'letter';
+        if (i < typedText.length) {
+          if (typedText[i] === sampleText[i]) {
+            letters[i].classList.add('correct');
+            correct++;
+          } else {
+            letters[i].classList.add('wrong');
+            errors++;
+            errorMap[sampleText[i]] = (errorMap[sampleText[i]] || 0) + 1;
+          }
+        }
+      }
+
+      // Live metrics
+      const elapsed = Math.max(1, totalTime - timeRemaining);
+      const wpm = (correct / 5) / (elapsed / 60);
+      const acc = typedText.length > 0 ? (correct / typedText.length) * 100 : 100;
+
+      hudWpm.textContent = Math.round(wpm);
+      hudAcc.textContent = `${Math.round(acc)}%`;
+      hudCons.textContent = `${computeConsistency()}%`;
+
+      // Track progress
+      const pProg = Math.min(100, (typedText.length / sampleText.length) * 100);
+      playerBar.style.width = `${pProg}%`;
+
+      updateCaret();
+      updateKeyboardNextKey(sampleText[typedText.length]);
+
+      if (typedText.length >= sampleText.length) {
+        finishTest();
+      }
+    });
+
+    function computeConsistency() {
+      if (keystrokeTimestamps.length < 5) return 100;
+      const latencies = [];
+      for (let i = 1; i < keystrokeTimestamps.length; i++) {
+        const d = keystrokeTimestamps[i] - keystrokeTimestamps[i - 1];
+        if (d > 10 && d < 2000) latencies.push(d);
+      }
+      if (latencies.length < 4) return 100;
+      const mean = latencies.reduce((a, b) => a + b, 0) / latencies.length;
+      const variance = latencies.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / latencies.length;
+      const stddev = Math.sqrt(variance);
+      const cv = mean > 0 ? (stddev / mean) : 0;
+      return Math.max(20, Math.min(100, Math.round(100 - cv * 65)));
+    }
+
+    // ── Timer & Bot ────────────────────────────────────────────────────────────
+    function startTimer() {
+      wpmTimeline.push(0);
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        hudTimer.textContent = timeRemaining;
+
+        const correct = wordsWrapper.querySelectorAll('.letter.correct').length;
+        const elapsed = totalTime - timeRemaining;
+        const wpm = (correct / 5) / (elapsed / 60);
+        wpmTimeline.push(Math.round(wpm));
+
+        // Bot Racer Progress
+        if (botWpm > 0) {
+          const botChars = (elapsed * botWpm * 5) / 60;
+          const bProg = Math.min(100, (botChars / sampleText.length) * 100);
+          botBar.style.width = `${bProg}%`;
+        }
+
+        if (timeRemaining <= 0) {
+          finishTest();
+        }
+      }, 1000);
+    }
+
+    function finishTest() {
+      clearInterval(timerInterval);
+      isRunning = false;
+      audio.playBell();
+
+      const correct = wordsWrapper.querySelectorAll('.letter.correct').length;
+      const elapsed = Math.max(1, totalTime - timeRemaining);
+      const finalWpm = ((correct / 5) / (elapsed / 60)).toFixed(1);
+      const finalCpm = Math.round(correct / (elapsed / 60));
+      const finalAcc = typedText.length > 0 ? ((correct / typedText.length) * 100).toFixed(1) : 100;
+      const finalCons = computeConsistency();
+
+      // Grade
+      let grade = 'D';
+      if (finalWpm >= 80 && finalAcc >= 97) grade = 'S+';
+      else if (finalWpm >= 65 && finalAcc >= 95) grade = 'A';
+      else if (finalWpm >= 50 && finalAcc >= 90) grade = 'B';
+      else if (finalWpm >= 35 && finalAcc >= 80) grade = 'C';
+
+      // Update Results View
+      document.getElementById('resWpm').textContent = finalWpm;
+      document.getElementById('resGrade').textContent = grade;
+      document.getElementById('resAcc').textContent = `${finalAcc}%`;
+      document.getElementById('resCons').textContent = `${finalCons}%`;
+      document.getElementById('resCpm').textContent = finalCpm;
+      document.getElementById('resTime').textContent = `${elapsed}s`;
+
+      // Save History
+      const hist = JSON.parse(localStorage.getItem('typo_history') || '[]');
+      hist.push({
+        date: new Date().toLocaleDateString(),
+        category: currentCategory,
+        wpm: finalWpm,
+        acc: finalAcc,
+        grade: grade
+      });
+      localStorage.setItem('typo_history', JSON.stringify(hist));
+
+      // Draw Chart
+      drawSpeedChart();
+
+      stageTyping.style.display = 'none';
+      stageResults.style.display = 'flex';
+      configBar.style.display = 'none';
+    }
+
+    function restartTest() {
+      initTest();
+    }
+
+    // ── Speed Timeline Chart ───────────────────────────────────────────────────
+    function drawSpeedChart() {
+      const canvas = document.getElementById('speedChart');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (wpmTimeline.length < 2) return;
+
+      const maxWpm = Math.max(60, ...wpmTimeline) * 1.15;
+      const padL = 40, padR = 20, padT = 20, padB = 30;
+      const w = canvas.width - padL - padR;
+      const h = canvas.height - padT - padB;
+
+      // Grid
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 3; i++) {
+        const y = padT + (h / 3) * i;
+        ctx.beginPath();
+        ctx.moveTo(padL, y);
+        ctx.lineTo(canvas.width - padR, y);
+        ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px Fira Code';
+        ctx.textAlign = 'right';
+        ctx.fillText(Math.round(maxWpm - (maxWpm / 3) * i), padL - 8, y + 4);
+      }
+
+      // Line
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+
+      const pts = wpmTimeline.map((val, idx) => {
+        const x = padL + (idx / (wpmTimeline.length - 1)) * w;
+        const y = padT + h - (val / maxWpm) * h;
+        return { x, y };
+      });
+
+      pts.forEach((pt, i) => {
+        if (i === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      });
+      ctx.stroke();
+
+      // Dots
+      ctx.fillStyle = '#10b981';
+      pts.forEach(pt => {
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    // ── Mode Switchers ─────────────────────────────────────────────────────────
+    function setCategory(cat, btn) {
+      currentCategory = cat;
+      document.querySelectorAll('#configBar .config-group:first-child .config-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      restartTest();
+    }
+
+    function setTime(sec, btn) {
+      totalTime = sec;
+      document.querySelectorAll('#configBar .config-group:nth-child(3) .config-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      restartTest();
+    }
+
+    function setBotSpeed(speed, btn) {
+      botWpm = speed;
+      document.querySelectorAll('#configBar .config-group:last-child .config-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('botSpeedLabel').textContent = speed;
+      document.getElementById('botLane').style.opacity = speed === 0 ? '0.3' : '1';
+    }
+
+    function toggleSound() {
+      audio.enabled = !audio.enabled;
+      document.getElementById('btnSound').textContent = audio.enabled ? '🔊 Sound: On' : '🔈 Sound: Off';
+    }
+
+    function toggleKeyboard() {
+      const kb = document.getElementById('keyboard');
+      kb.style.display = kb.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    // ── History & Certificate ──────────────────────────────────────────────────
+    function openHistoryModal() {
+      const modal = document.getElementById('historyModal');
+      const tbody = document.getElementById('historyTableBody');
+      const hist = JSON.parse(localStorage.getItem('typo_history') || '[]');
+      tbody.innerHTML = '';
+      hist.slice(-8).reverse().forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${item.date}</td><td>${item.category}</td><td style="color:var(--accent); font-weight:700;">${item.wpm}</td><td>${item.acc}%</td><td><span style="padding:2px 8px; border-radius:10px; background:rgba(56,189,248,0.15); color:var(--accent); font-weight:700;">${item.grade}</span></td>`;
+        tbody.appendChild(tr);
+      });
+      modal.style.display = 'flex';
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('historyModal').style.display = 'none';
+    }
+
+    function clearHistory() {
+      localStorage.removeItem('typo_history');
+      document.getElementById('historyTableBody').innerHTML = '';
+    }
+
+    function exportCertificate() {
+      window.open('Typing_Aptitude_Certificate.html', '_blank');
+    }
+
+    // Global Key Listener (Tab to restart)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        restartTest();
+      }
+    });
+
+    // Initialize
+    renderKeyboard();
+    initTest();
+  </script>
+</body>
+</html>
