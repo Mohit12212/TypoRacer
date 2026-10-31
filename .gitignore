@@ -1,0 +1,20 @@
+# Compiled Windows application
+*.exe
+*.dll
+*.obj
+*.o
+*.a
+
+# Runtime scores and session history
+scores.dat
+history.csv
+
+# Generated certificates and exports
+*Certificate*.html
+!docs/Typing_Aptitude_Certificate.html
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
